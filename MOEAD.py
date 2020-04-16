@@ -35,11 +35,11 @@ class OnePointCrossOver(CrossOver):
         return y1, y2
     
 # 一様交叉
-class OnePointCrossOver(CrossOver):
+class UniformCrossOver(CrossOver):
     def __init__(self, length, mask):
         self.length = length
         self.mask = mask
-        if len(self.length) != len(self.mask):
+        if self.lenght != len(self.mask):
             print("パラメータの設定に問題があります")
     
     def cross_over(self, x1, x2):
