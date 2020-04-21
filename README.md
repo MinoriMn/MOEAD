@@ -11,6 +11,6 @@
 - 1000世代実行
 - 結果ファイル
  - <a href="https://github.com/MinoriMn/MOEAD/blob/run/gen1000/solution_profit_weight_gen1000.xlsx">`solution_profit_weight_gen1000.xlsx`</a> 最終世代の各個体のprofitとweight
- - <a href="https://github.com/MinoriMn/MOEAD/blob/run/gen1000/solution_x.csv">`solution_profit_x.xlsx`</a> 最終世代の各個体の遺伝子
+ - <a href="https://github.com/MinoriMn/MOEAD/blob/run/gen1000/solution_x.csv">`solution_x.csv`</a> 最終世代の各個体の遺伝子
 
-<img src="gen1000_graph.png">
+<img src="gen1000_graph.png" style="width:40%;">
