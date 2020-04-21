@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[31]:
+# In[1]:
 
 
 from scipy.special import comb
@@ -10,7 +10,7 @@ import numpy as np
 import random
 
 
-# In[32]:
+# In[2]:
 
 
 # 交叉
@@ -51,7 +51,7 @@ class UniformCrossOver(CrossOver):
         return y1, y2
 
 
-# In[33]:
+# In[3]:
 
 
 class Mutation:
@@ -59,11 +59,11 @@ class Mutation:
         self.f = f
         self.mutation = mutation
         
-    def mutation(self, y):
-        self.f(y, self.mutation)
+    def mutation_func(self, x):
+        return self.f(x, self.mutation)
 
 
-# In[30]:
+# In[4]:
 
 
 class MOEAD:
@@ -83,6 +83,8 @@ class MOEAD:
         self.cross_over = cross_over
         self.mutation = mutation
         print("m:%d, H:%d, N:%d, T:%d" % (self.m, self.H, self.N, self.T))
+        self.init_x_func = None
+        self.init_z_func = None
         
     # 初期化フェーズ
     def init_phase(self):
@@ -94,7 +96,7 @@ class MOEAD:
                 lamb.append(combo[i] - combo[i - 1] - 1)
             lamb.append(self.H + self.m - 2 - combo[self.m - 2])
             
-            self.L.append(np.array(list(map(lambda x: x / self.H, lamb))))
+            self.L.append(np.array(list(map(lambda x: x / self.H  + 0.0001, lamb))))
         if len(self.L) != self.N:
             print("重みベクトルの生成数が正しくありません N:%d != L:%d" % (self.N, self.L))
             
@@ -106,12 +108,19 @@ class MOEAD:
             self.B[i] = sorted([sorted_dis[k][0] for k in range(self.T)])
             
         # 初期集団生成
-        init_rand_min = 1.0
-        init_rand_max = 2.0
-        self.x = np.array([lamb * random.uniform(init_rand_min, init_rand_max) for lamb in self.L])
+        if self.init_x_func == None:
+            init_rand_min = 1.0
+            init_rand_max = 2.0
+            self.x = np.array([lamb * random.uniform(init_rand_min, init_rand_max) for lamb in self.L])
+        else:
+            self.x = self.init_x_func(self.L)
         
         # 理想点初期化
-        self.z = np.array([0 for _ in range(self.m)])
+        if self.init_z_func == None:
+            self.z = np.array([0 for _ in range(self.m)])
+        else:
+            self.z = self.init_z_func(self.m)
+        
             
     def solution_search_phase(self, generation):
         for g in range(generation):
@@ -124,23 +133,29 @@ class MOEAD:
                 y1, y2 = self.cross_over.cross_over(x_p, x_q)
                 y = y1 if random.randrange(2) == 0 else y2
                 #突然変異
-                y = self.mutation.mutation(y)
+                self.mutation.mutation_func(y)
                     
+                profit_y = [f(y) for f in self.fs]
                 
                 # 理想点更新
                 for j in range(self.m):
-                    if y[j] < self.z[j]:
+                    if profit_y[j] < self.z[j]:
                         self.z[j] = y[j]
                 
                 # 解集団の更新
                 for j in self.B[i]:
                     lamb = self.L[j]
                     g_x = max([f(self.x[j]) / lamb[k] for k, f in enumerate(self.fs)])
-                    g_y = max([f(y) / lamb[k] for k, f in enumerate(self.fs)])
+                    g_y = max([fy / lamb[k] for k, fy in enumerate(profit_y)])
                     if g_y < g_x:
                         self.x[j] = y
-                        
         return self.x        
+    
+    def set_init_x_func(self, init_x_func):
+        self.init_x_func = init_x_func
+        
+    def set_init_z_func(self, init_z_func):
+        self.init_z_func = init_z_func
 
 
 # In[ ]:
