@@ -8,6 +8,7 @@ from scipy.special import comb
 import itertools
 import numpy as np
 import random
+from tqdm import tqdm #プログレスバー
 
 
 # In[2]:
@@ -123,7 +124,7 @@ class MOEAD:
         
             
     def solution_search_phase(self, generation):
-        for g in range(generation):
+        for g in tqdm(range(generation)):
             for i in range(self.N):
                # 親選択
                 p, q = random.sample(self.B[i], 2)
@@ -156,10 +157,4 @@ class MOEAD:
         
     def set_init_z_func(self, init_z_func):
         self.init_z_func = init_z_func
-
-
-# In[ ]:
-
-
-
 
